@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Library Management System</title>
+  </head>
+  <body>
+    <h1>Library Management System</h1>
+
+    <nav>
+      <a href="#" data-section="booksSection">Books</a> |
+      <a href="#" data-section="membersSection">Members</a> |
+      <a href="#" data-section="addBookSection">Add Book</a> |
+      <a href="#" data-section="addMemberSection">Add Member</a>
+    </nav>
+
+    <hr />
+
+    <section id="booksSection" class="section active">
+      <h2>Books</h2>
+      <form id="searchBookForm">
+        <input type="text" id="searchBook" placeholder="Search by title or author" />
+        <button type="submit">Search</button>
+      </form>
+      <table id="booksTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Available</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="membersSection" class="section" style="display: none">
+      <h2>Members</h2>
+      <table id="membersTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="addBookSection" class="section" style="display: none">
+      <h2>Add Book</h2>
+      <form id="addBookForm">
+        <label for="bookTitle">Title</label>
+        <input type="text" id="bookTitle" name="title" required />
+        <br />
+        <label for="bookAuthor">Author</label>
+        <input type="text" id="bookAuthor" name="author" required />
+        <br />
+        <button type="submit">Add Book</button>
+      </form>
+    </section>
+
+    <section id="addMemberSection" class="section" style="display: none">
+      <h2>Add Member</h2>
+      <form id="addMemberForm">
+        <label for="memberName">Name</label>
+        <input type="text" id="memberName" name="name" required />
+        <br />
+        <label for="memberEmail">Email</label>
+        <input type="email" id="memberEmail" name="email" required />
+        <br />
+        <button type="submit">Add Member</button>
+      </form>
+    </section>
+
+    <script>
+      const AUTH_TOKEN = "securetoken";
+
+      async function fetchBooks(query = "") {
+        const response = await fetch(`/books?search=${query}`, {
+          headers: { Authorization: AUTH_TOKEN },
+        });
+        const books = await response.json();
+        const booksTable = document.getElementById("booksTable").querySelector("tbody");
+        booksTable.innerHTML = "";
+
+        books.forEach((book) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${book.id}</td>
+            <td>${book.title}</td>
+            <td>${book.author}</td>
+            <td>${book.available ? "Yes" : "No"}</td>
+            <td>
+              <button onclick="editBook(${book.id}, '${book.title}', '${
+            book.author
+          }')">Edit</button>
+              <button onclick="deleteBook(${book.id})">Delete</button>
+            </td>
+          `;
+          booksTable.appendChild(row);
+        });
+      }
+
+      async function fetchMembers() {
+        const response = await fetch("/members", {
+          headers: { Authorization: AUTH_TOKEN },
+        });
+        const members = await response.json();
+        const membersTable = document.getElementById("membersTable").querySelector("tbody");
+        membersTable.innerHTML = "";
+
+        members.forEach((member) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${member.id}</td>
+            <td>${member.name}</td>
+            <td>${member.email}</td>
+            <td>
+              <button onclick="editMember(${member.id}, '${member.name}', '${member.email}')">Edit</button>
+              <button onclick="deleteMember(${member.id})">Delete</button>
+            </td>
+          `;
+          membersTable.appendChild(row);
+        });
+      }
+
+      document.querySelectorAll("nav a").forEach(function (link) {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          const sectionId = event.target.getAttribute("data-section");
+
+          document.querySelectorAll(".section").forEach((section) => {
+            section.style.display = "none";
+          });
+          document.getElementById(sectionId).style.display = "block";
+        });
+      });
+
+      fetchBooks();
+      fetchMembers();
+    </script>
+  </body>
+</html>
