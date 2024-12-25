@@ -23,8 +23,8 @@ A simple API for managing books and members in a library system. The API support
 ## Setup Instructions
 
 1. Clone the repository:
-   `git clone https://github.com/your-repository/library-management-system.git`
-   `cd library-management-system`
+   `git clone https://github.com/aghasyedi/lms-api.git`
+   `cd lmsa-api`
 
 2. Install dependencies:
    `pip install flask`
